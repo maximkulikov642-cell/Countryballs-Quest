@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countryballs Adventure | Приключения Шариков-Стран</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: #fff;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 #c0392b, 6px 6px 0 rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #ecf0f1;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .country-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 3px solid #f1c40f;
+        }
+        
+        .country-option {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .country-option:hover {
+            transform: scale(1.1);
+            border-color: white;
+        }
+        
+        .country-option.selected {
+            transform: scale(1.15);
+            border-color: #f1c40f;
+            box-shadow: 0 0 15px #f1c40f;
+        }
+        
+        .poland {
+            background: linear-gradient(to bottom, white 50%, #dc143c 50%);
+            color: #333;
+        }
+        
+        .germany {
+            background: linear-gradient(to bottom, #000000 33%, #dd0000 33%, #dd0000 66%, #ffcc00 66%);
+        }
+        
+        .france {
+            background: linear-gradient(to right, #002495 33%, white 33%, white 66%, #ed2939 66%);
+            color: #333;
+        }
+        
+        .uk {
+            background: linear-gradient(135deg, #012169 40%, white 40%, white 43%, #C8102E 43%, #C8102E 57%, white 57%, white 60%, #012169 60%);
+        }
+        
+        .japan {
+            background: radial-gradient(circle at center, #bc002d 25%, white 25%);
+            color: #333;
+        }
+        
+        .russia {
+            background: linear-gradient(to bottom, white 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
+            color: #333;
+        }
+        
+        .usa {
+            background: linear-gradient(to bottom, #3c3b6e 40%, white 40%, white 43%, #b22234 43%, #b22234 57%, white 57%, white 60%, #3c3b6e 60%);
+            position: relative;
+        }
+        
+        .usa::before {
+            content: "★";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .italy {
+            background: linear-gradient(to right, #009246 33%, white 33%, white 66%, #ce2b37 66%);
+            color: #333;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 800px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 3px solid #f1c40f;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .score-container, .high-score-container, .time-container, .flags-container {
+            text-align: center;
+        }
+        
+        .score-label, .high-score-label, .time-label, .flags-label {
+            font-size: 1rem;
+            color: #bdc3c7;
+            margin-bottom: 5px;
+        }
+        
+        .score-value, .high-score-value, .time-value, .flags-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f1c40f;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .game-board-container {
+            position: relative;
+        }
+        
+        #game-board {
+            border: 4px solid #f1c40f;
+            border-radius: 10px;
+            background-color: #34495e;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 14px 32px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #f1c40f;
+            color: #2c3e50;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 0 #f39c12;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            background-color: #f39c12;
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 #e67e22;
+        }
+        
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #e67e22;
+        }
+        
+        button:disabled {
+            background-color: #7f8c8d;
+            color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 6px 0 #636e72;
+        }
+        
+        .instructions {
+            margin-top: 25px;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #f1c40f;
+        }
+        
+        .instructions h3 {
+            color: #f1c40f;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .instructions-content {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        
+        .instructions-column {
+            flex: 1;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-size: 1.1rem;
+        }
+        
+        .instructions .key {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: #2c3e50;
+            border-radius: 6px;
+            font-family: monospace;
+            margin: 0 5px;
+            border: 1px solid #f1c40f;
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        
+        .mobile-controls {
+            display: none;
+            margin-top: 25px;
+            width: 320px;
+            justify-content: space-between;
+        }
+        
+        .mobile-controls button {
+            padding: 20px 25px;
+            font-size: 1.8rem;
+        }
+        
+        .game-over, .level-complete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .game-over h2 {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 #c0392b, 6px 6px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .level-complete h2 {
+            font-size: 4rem;
+            color: #2ecc71;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 #27ae60, 6px 6px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .game-over p, .level-complete p {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #fff;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .flag-collection {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .collected-flag {
+            width: 60px;
+            height: 40px;
+            border-radius: 5px;
+            border: 2px solid white;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .collected-flag.collected {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 850px) {
+            .game-info, #game-board {
+                width: 95vw;
+            }
+            
+            .game-info {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .instructions-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .mobile-controls {
+                display: flex;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .country-option {
+                width: 60px;
+                height: 60px;
+                font-size: 0.8rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .game-over h2, .level-complete h2 {
+                font-size: 2.5rem;
+            }
+            
+            .game-over p, .level-complete p {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            background: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: black;
+            font-weight: bold;
+            border: 2px solid #333;
+            z-index: 5;
+            max-width: 200px;
+            text-align: center;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 19px;
+            border-width: 11px 11px 0;
+            border-style: solid;
+            border-color: #333 transparent transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>COUNTRYBALLS ADVENTURE</h1>
+        <div class="subtitle">Собери все флаги и стань истинным патриотом!</div>
+    </div>
+    
+    <div class="game-container">
+        <div class="country-selector">
+            <div class="country-option poland selected" data-country="poland" title="Poland">POLAND</div>
+            <div class="country-option germany" data-country="germany" title="Germany">GER</div>
+            <div class="country-option france" data-country="france" title="France">FRA</div>
+            <div class="country-option uk" data-country="uk" title="United Kingdom">UK</div>
+            <div class="country-option usa" data-country="usa" title="USA">USA</div>
+            <div class="country-option russia" data-country="russia" title="Russia">RUS</div>
+            <div class="country-option japan" data-country="japan" title="Japan">JPN</div>
+            <div class="country-option italy" data-country="italy" title="Italy">ITA</div>
+        </div>
+        
+        <div class="game-info">
+            <div class="score-container">
+                <div class="score-label">ОЧКИ</div>
+                <div class="score-value">0</div>
+            </div>
+            <div class="high-score-container">
+                <div class="high-score-label">РЕКОРД</div>
+                <div class="high-score-value">0</div>
+            </div>
+            <div class="time-container">
+                <div class="time-label">ВРЕМЯ</div>
+                <div class="time-value">60</div>
+            </div>
+            <div class="flags-container">
+                <div class="flags-label">ФЛАГИ</div>
+                <div class="flags-value">0/8</div>
+            </div>
+        </div>
+        
+        <div class="game-board-container">
+            <canvas id="game-board" width="800" height="500"></canvas>
+            
+            <div class="flag-collection" id="flag-collection">
+                <div class="collected-flag poland" id="flag-poland"></div>
+                <div class="collected-flag germany" id="flag-germany"></div>
+                <div class="collected-flag france" id="flag-france"></div>
+                <div class="collected-flag uk" id="flag-uk"></div>
+                <div class="collected-flag usa" id="flag-usa"></div>
+                <div class="collected-flag russia" id="flag-russia"></div>
+                <div class="collected-flag japan" id="flag-japan"></div>
+                <div class="collected-flag italy" id="flag-italy"></div>
+            </div>
+            
+            <div class="game-over" id="game-over">
+                <h2>KURWA!</h2>
+                <p>Ты не смог собрать все флаги!</p>
+                <p>Твой результат: <span id="final-score">0</span> очков</p>
+                <div class="buttons">
+                    <button id="restart-btn">ПОПРОБОВАТЬ СНОВА</button>
+                </div>
+            </div>
+            
+            <div class="level-complete" id="level-complete">
+                <h2>OF COURSE!</h2>
+                <p>Ты собрал все флаги!</p>
+                <p>Ты настоящий патриот с <span id="final-score-complete">0</span> очками!</p>
+                <div class="buttons">
+                    <button id="next-level-btn">ИГРАТЬ ЕЩЁ</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="buttons">
+                <button id="start-btn">НАЧАТЬ ИГРУ</button>
+                <button id="pause-btn" disabled>ПАУЗА</button>
+                <button id="restart-btn2">СБРОС</button>
+            </div>
+            
+            <div class="mobile-controls">
+                <button id="left-btn">←</button>
+                <button id="up-btn">↑</button>
+                <button id="right-btn">→</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>ИНСТРУКЦИЯ ДЛЯ ПАТРИОТА</h3>
+            <div class="instructions-content">
+                <div class="instructions-column">
+                    <h4>Управление шариком:</h4>
+                    <ul>
+                        <li>Влево: <span class="key">←</span> или <span class="key">A</span></li>
+                        <li>Вправо: <span class="key">→</span> или <span class="key">D</span></li>
+                        <li>Вверх: <span class="key">↑</span> или <span class="key">W</span></li>
+                        <li>Вниз: <span class="key">↓</span> или <span class="key">S</span></li>
+                        <li>Пауза: <span class="key">P</span></li>
+                    </ul>
+                </div>
+                <div class="instructions-column">
+                    <h4>Цели игры:</h4>
+                    <ul>
+                        <li>Собери все 8 флагов разных стран</li>
+                        <li>Избегай вражеских шариков</li>
+                        <li>Собери бонусы для получения преимуществ</li>
+                        <li>Уложись в 60 секунд!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="speech-bubble" id="speech-bubble"></div>
+
+    <script>
+        // Получаем элементы DOM
+        const gameBoard = document.getElementById('game-board');
+        const ctx = gameBoard.getContext('2d');
+        const scoreValue = document.querySelector('.score-value');
+        const highScoreValue = document.querySelector('.high-score-value');
+        const timeValue = document.querySelector('.time-value');
+        const flagsValue = document.querySelector('.flags-value');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartBtn2 = document.getElementById('restart-btn2');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const gameOverScreen = document.getElementById('game-over');
+        const levelCompleteScreen = document.getElementById('level-complete');
+        const finalScore = document.getElementById('final-score');
+        const finalScoreComplete = document.getElementById('final-score-complete');
+        const speechBubble = document.getElementById('speech-bubble');
+        const flagElements = {
+            poland: document.getElementById('flag-poland'),
+            germany: document.getElementById('flag-germany'),
+            france: document.getElementById('flag-france'),
+            uk: document.getElementById('flag-uk'),
+            usa: document.getElementById('flag-usa'),
+            russia: document.getElementById('flag-russia'),
+            japan: document.getElementById('flag-japan'),
+            italy: document.getElementById('flag-italy')
+        };
+        
+        // Мобильные кнопки управления
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        const upBtn = document.getElementById('up-btn');
+        
+        // Выбор страны
+        const countryOptions = document.querySelectorAll('.country-option');
+        let selectedCountry = 'poland';
+        
+        countryOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                countryOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedCountry = this.getAttribute('data-country');
+                initPlayer();
+            });
+        });
+        
+        // Игровые константы
+        const PLAYER_SIZE = 40;
+        const PLAYER_SPEED = 6;
+        const FLAG_SIZE = 30;
+        const ENEMY_SIZE = 35;
+        const ENEMY_SPEED_MIN = 1.5;
+        const ENEMY_SPEED_MAX = 3.5;
+        const BONUS_SIZE = 25;
+        const GAME_TIME = 60; // секунд
+        
+        // Игровые переменные
+        let player = {
+            x: 0,
+            y: 0,
+            size: PLAYER_SIZE,
+            color: '',
+            vx: 0,
+            vy: 0
+        };
+        
+        let flags = [];
+        let enemies = [];
+        let bonuses = [];
+        let score = 0;
+        let highScore = localStorage.getItem('countryballsHighScore') || 0;
+        let timeLeft = GAME_TIME;
+        let flagsCollected = 0;
+        let totalFlags = 8;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameLoop;
+        let countdown;
+        let speedBonusActive = false;
+        let speedBonusEndTime = 0;
+        
+        // Цвета для стран
+        const countryColors = {
+            poland: {top: '#FFFFFF', bottom: '#DC143C'},
+            germany: {top: '#000000', middle: '#DD0000', bottom: '#FFCC00'},
+            france: {left: '#002495', middle: '#FFFFFF', right: '#ED2939'},
+            uk: {bg: '#012169', cross: '#C8102E', lines: '#FFFFFF'},
+            usa: {stars: '#FFFFFF', stripes: ['#B22234', '#FFFFFF']},
+            russia: {top: '#FFFFFF', middle: '#0039A6', bottom: '#D52B1E'},
+            japan: {bg: '#FFFFFF', circle: '#BC002D'},
+            italy: {left: '#009246', middle: '#FFFFFF', right: '#CE2B37'}
+        };
+        
+        // Фразы для speech bubble
+        const countryPhrases = {
+            poland: ["Kurwa!", "Poland stronk!", "Can into space?", "No potato only poland!"],
+            germany: ["Achtung!", "Ordnung muss sein!", "Das ist gut!", "Wir schaffen das!"],
+            france: ["Oui oui!", "Baguette!", "Hon hon hon!", "Vive la France!"],
+            uk: ["God save the Queen!", "Tea time!", "Keep calm and carry on", "Rule Britannia!"],
+            usa: ["Freedom!", "Murica!", "Eagle screech!", "Apple pie!"],
+            russia: ["Cyka blyat!", "For motherland!", "Vodka!", "Bear riding comrade!"],
+            japan: ["Kawaii!", "Anime!", "Sushi!", "Banzai!"],
+            italy: ["Mama mia!", "Pizza!", "Spaghetti!", "Mamma mia!"]
+        };
+        
+        // Инициализация игрока
+        function initPlayer() {
+            player.x = gameBoard.width / 2 - PLAYER_SIZE / 2;
+            player.y = gameBoard.height / 2 - PLAYER_SIZE / 2;
+            player.vx = 0;
+            player.vy = 0;
+        }
+        
+        // Создание флагов
+        function createFlags() {
+            flags = [];
+            const countries = Object.keys(countryColors);
+            
+            // Сбрасываем собранные флаги
+            flagsCollected = 0;
+            flagsValue.textContent = `0/${totalFlags}`;
+            Object.values(flagElements).forEach(flag => flag.classList.remove('collected'));
+            
+            // Создаем по одному флагу каждой страны
+            countries.forEach(country => {
+                if (country === selectedCountry) return; // Не создаем флаг своей страны
+                
+                let flagX, flagY;
+                let overlapping = true;
+                let attempts = 0;
+                
+                // Убедимся, что флаг не появляется слишком близко к игроку или другим объектам
+                while (overlapping && attempts < 100) {
+                    flagX = Math.random() * (gameBoard.width - FLAG_SIZE * 2) + FLAG_SIZE;
+                    flagY = Math.random() * (gameBoard.height - FLAG_SIZE * 2) + FLAG_SIZE;
+                    
+                    // Проверяем расстояние до игрока
+                    const distToPlayer = Math.sqrt(
+                        Math.pow(flagX - player.x, 2) + Math.pow(flagY - player.y, 2)
+                    );
+                    
+                    overlapping = distToPlayer < 150;
+                    
+                    // Проверяем расстояние до других флагов
+                    for (let existingFlag of flags) {
+                        const distToFlag = Math.sqrt(
+                            Math.pow(flagX - existingFlag.x, 2) + Math.pow(flagY - existingFlag.y, 2)
+                        );
+                        if (distToFlag < 100) overlapping = true;
+                    }
+                    
+                    attempts++;
+                }
+                
+                flags.push({
+                    x: flagX,
+                    y: flagY,
+                    size: FLAG_SIZE,
+                    country: country,
+                    collected: false
+                });
+            });
+            
+            totalFlags = flags.length;
+        }
+        
+        // Создание врагов
+        function createEnemies(count) {
+            enemies = [];
+            for (let i = 0; i < count; i++) {
+                const side = Math.floor(Math.random() * 4);
+                let x, y;
+                
+                switch(side) {
+                    case 0: // сверху
+                        x = Math.random() * gameBoard.width;
+                        y = -ENEMY_SIZE;
+                        break;
+                    case 1: // справа
+                        x = gameBoard.width + ENEMY_SIZE;
+                        y = Math.random() * gameBoard.height;
+                        break;
+                    case 2: // снизу
+                        x = Math.random() * gameBoard.width;
+                        y = gameBoard.height + ENEMY_SIZE;
+                        break;
+                    case 3: // слева
+                        x = -ENEMY_SIZE;
+                        y = Math.random() * gameBoard.height;
+                        break;
+                }
+                
+                // Выбираем случайную страну для врага
+                const enemyCountries = Object.keys(countryColors);
+                const enemyCountry = enemyCountries[Math.floor(Math.random() * enemyCountries.length)];
+                
+                enemies.push({
+                    x: x,
+                    y: y,
+                    size: ENEMY_SIZE,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    speed: ENEMY_SPEED_MIN + Math.random() * (ENEMY_SPEED_MAX - ENEMY_SPEED_MIN),
+                    country: enemyCountry,
+                    type: 'enemy'
+                });
+            }
+        }
+        
+        // Создание бонусов
+        function createBonuses(count) {
+            bonuses = [];
+            for (let i = 0; i < count; i++) {
+                bonuses.push({
+                    x: Math.random() * (gameBoard.width - BONUS_SIZE),
+                    y: Math.random() * (gameBoard.height - BONUS_SIZE),
+                    size: BONUS_SIZE,
+                    type: Math.random() > 0.5 ? 'speed' : 'time',
+                    active: true
+                });
+            }
+        }
+        
+        // Отрисовка шарика-страны
+        function drawCountryball(x, y, size, country) {
+            // Рисуем основу шарика
+            ctx.beginPath();
+            ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+            
+            // Заполняем в зависимости от страны
+            switch(country) {
+                case 'poland':
+                    // Польша: белый сверху, красный снизу
+                    ctx.fillStyle = countryColors.poland.top;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.rect(x, y + size/2, size, size/2);
+                    ctx.fillStyle = countryColors.poland.bottom;
+                    ctx.fill();
+                    break;
+                    
+                case 'germany':
+                    // Германия: черный-красный-желтый
+                    const germanHeight = size/3;
+                    ctx.fillStyle = countryColors.germany.top;
+                    ctx.fillRect(x, y, size, germanHeight);
+                    ctx.fillStyle = countryColors.germany.middle;
+                    ctx.fillRect(x, y + germanHeight, size, germanHeight);
+                    ctx.fillStyle = countryColors.germany.bottom;
+                    ctx.fillRect(x, y + 2*germanHeight, size, germanHeight);
+                    break;
+                    
+                case 'france':
+                    // Франция: синий-белый-красный
+                    const frenchWidth = size/3;
+                    ctx.fillStyle = countryColors.france.left;
+                    ctx.fillRect(x, y, frenchWidth, size);
+                    ctx.fillStyle = countryColors.france.middle;
+                    ctx.fillRect(x + frenchWidth, y, frenchWidth, size);
+                    ctx.fillStyle = countryColors.france.right;
+                    ctx.fillRect(x + 2*frenchWidth, y, frenchWidth, size);
+                    break;
+                    
+                case 'russia':
+                    // Россия: белый-синий-красный
+                    const russianHeight = size/3;
+                    ctx.fillStyle = countryColors.russia.top;
+                    ctx.fillRect(x, y, size, russianHeight);
+                    ctx.fillStyle = countryColors.russia.middle;
+                    ctx.fillRect(x, y + russianHeight, size, russianHeight);
+                    ctx.fillStyle = countryColors.russia.bottom;
+                    ctx.fillRect(x, y + 2*russianHeight, size, russianHeight);
+                    break;
+                    
+                case 'japan':
+                    // Япония: белый круг на красном фоне
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + size/2, y + size/2, size/4, 0, Math.PI * 2);
+                    ctx.fillStyle = countryColors.japan.circle;
+                    ctx.fill();
+                    break;
+                    
+                case 'italy':
+                    // Италия: зеленый-белый-красный
+                    const italianWidth = size/3;
+                    ctx.fillStyle = countryColors.italy.left;
+                    ctx.fillRect(x, y, italianWidth, size);
+                    ctx.fillStyle = countryColors.italy.middle;
+                    ctx.fillRect(x + italianWidth, y, italianWidth, size);
+                    ctx.fillStyle = countryColors.italy.right;
+                    ctx.fillRect(x + 2*italianWidth, y, italianWidth, size);
+                    break;
+                    
+                default:
+                    // По умолчанию: однотонный
+                    ctx.fillStyle = '#3498db';
+                    ctx.fill();
+            }
+            
+            // Черная обводка
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Глазки для оживления
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(x + size/3, y + size/3, size/10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(x + 2*size/3, y + size/3, size/10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Отрисовка флага
+        function drawFlag(x, y, size, country) {
+            // Простая прямоугольная версия флага
+            switch(country) {
+                case 'poland':
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x, y, size, size/2);
+                    ctx.fillStyle = '#DC143C';
+                    ctx.fillRect(x, y + size/2, size, size/2);
+                    break;
+                case 'germany':
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(x, y, size, size/3);
+                    ctx.fillStyle = '#DD0000';
+                    ctx.fillRect(x, y + size/3, size, size/3);
+                    ctx.fillStyle = '#FFCC00';
+                    ctx.fillRect(x, y + 2*size/3, size, size/3);
+                    break;
+                case 'france':
+                    ctx.fillStyle = '#002495';
+                    ctx.fillRect(x, y, size/3, size);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x + size/3, y, size/3, size);
+                    ctx.fillStyle = '#ED2939';
+                    ctx.fillRect(x + 2*size/3, y, size/3, size);
+                    break;
+                case 'uk':
+                    // Упрощенный UK флаг
+                    ctx.fillStyle = '#012169';
+                    ctx.fillRect(x, y, size, size);
+                    ctx.fillStyle = '#C8102E';
+                    // Красный крест
+                    ctx.fillRect(x + size/3, y, size/3, size);
+                    ctx.fillRect(x, y + size/3, size, size/3);
+                    break;
+                case 'usa':
+                    // Упрощенный USA флаг
+                    ctx.fillStyle = '#3C3B6E';
+                    ctx.fillRect(x, y, size, size/2);
+                    ctx.fillStyle = '#B22234';
+                    // Красные полосы
+                    for (let i = 0; i < 3; i++) {
+                        ctx.fillRect(x, y + size/2 + i*(size/6), size, size/12);
+                    }
+                    // Звезда
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = `${size/4}px Arial`;
+                    ctx.fillText('★', x + size/4, y + size/4);
+                    break;
+                case 'russia':
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x, y, size, size/3);
+                    ctx.fillStyle = '#0039A6';
+                    ctx.fillRect(x, y + size/3, size, size/3);
+                    ctx.fillStyle = '#D52B1E';
+                    ctx.fillRect(x, y + 2*size/3, size, size/3);
+                    break;
+                case 'japan':
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x, y, size, size);
+                    ctx.fillStyle = '#BC002D';
+                    ctx.beginPath();
+                    ctx.arc(x + size/2, y + size/2, size/4, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'italy':
+                    ctx.fillStyle = '#009246';
+                    ctx.fillRect(x, y, size/3, size);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(x + size/3, y, size/3, size);
+                    ctx.fillStyle = '#CE2B37';
+                    ctx.fillRect(x + 2*size/3, y, size/3, size);
+                    break;
+            }
+            
+            // Обводка флага
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, size, size);
+        }
+        
+        // Отрисовка бонуса
+        function drawBonus(x, y, size, type) {
+            ctx.beginPath();
+            if (type === 'speed') {
+                // Бонус скорости - молния
+                ctx.fillStyle = '#F1C40F';
+                ctx.fillRect(x, y, size, size);
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = `${size}px Arial`;
+                ctx.fillText('⚡', x, y + size);
+            } else {
+                // Бонус времени - часы
+                ctx.fillStyle = '#2ECC71';
+                ctx.fillRect(x, y, size, size);
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = `${size}px Arial`;
+                ctx.fillText('⏰', x, y + size);
+            }
+        }
+        
+        // Показ speech bubble
+        function showSpeechBubble(text, x, y) {
+            speechBubble.textContent = text;
+            speechBubble.style.left = `${x}px`;
+            speechBubble.style.top = `${y - 80}px`;
+            speechBubble.style.display = 'block';
+            
+            setTimeout(() => {
+                speechBubble.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Отрисовка игры
+        function drawGame() {
+            // Очистка холста
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(0, 0, gameBoard.width, gameBoard.height);
+            
+            // Фоновый узор
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < gameBoard.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, gameBoard.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < gameBoard.height; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(gameBoard.width, i);
+                ctx.stroke();
+            }
+            
+            // Отрисовка флагов
+            flags.forEach(flag => {
+                if (!flag.collected) {
+                    drawFlag(flag.x, flag.y, flag.size, flag.country);
+                }
+            });
+            
+            // Отрисовка бонусов
+            bonuses.forEach(bonus => {
+                if (bonus.active) {
+                    drawBonus(bonus.x, bonus.y, bonus.size, bonus.type);
+                }
+            });
+            
+            // Отрисовка врагов
+            enemies.forEach(enemy => {
+                drawCountryball(enemy.x, enemy.y, enemy.size, enemy.country);
+            });
+            
+            // Отрисовка игрока
+            drawCountryball(player.x, player.y, player.size, selectedCountry);
+            
+            // Если активен бонус скорости, рисуем эффект
+            if (speedBonusActive) {
+                ctx.strokeStyle = '#F1C40F';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.arc(
+                    player.x + player.size/2, 
+                    player.y + player.size/2, 
+                    player.size/2 + 5, 
+                    0, 
+                    Math.PI * 2
+                );
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        // Обновление игры
+        function gameUpdate() {
+            if (gamePaused) return;
+            
+            // Обновление позиции игрока
+            player.x += player.vx;
+            player.y += player.vy;
+            
+            // Ограничение игрока в пределах поля
+            player.x = Math.max(0, Math.min(gameBoard.width - player.size, player.x));
+            player.y = Math.max(0, Math.min(gameBoard.height - player.size, player.y));
+            
+            // Обновление врагов
+            enemies.forEach(enemy => {
+                enemy.x += enemy.vx * enemy.speed;
+                enemy.y += enemy.vy * enemy.speed;
+                
+                // Отскок от стен
+                if (enemy.x <= 0 || enemy.x >= gameBoard.width - enemy.size) {
+                    enemy.vx *= -1;
+                }
+                if (enemy.y <= 0 || enemy.y >= gameBoard.height - enemy.size) {
+                    enemy.vy *= -1;
+                }
+                
+                // Проверка столкновения с игроком
+                const dx = player.x + player.size/2 - (enemy.x + enemy.size/2);
+                const dy = player.y + player.size/2 - (enemy.y + enemy.size/2);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.size/2 + enemy.size/2) {
+                    gameOver();
+                    return;
+                }
+            });
+            
+            // Проверка сбора флагов
+            flags.forEach(flag => {
+                if (!flag.collected) {
+                    const dx = player.x + player.size/2 - (flag.x + flag.size/2);
+                    const dy = player.y + player.size/2 - (flag.y + flag.size/2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < player.size/2 + flag.size/2) {
+                        flag.collected = true;
+                        flagsCollected++;
+                        score += 100;
+                        scoreValue.textContent = score;
+                        flagsValue.textContent = `${flagsCollected}/${totalFlags}`;
+                        
+                        // Обновляем UI собранного флага
+                        flagElements[flag.country].classList.add('collected');
+                        
+                        // Показываем случайную фразу
+                        const phrases = countryPhrases[flag.country] || ["Flag collected!"];
+                        const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+                        showSpeechBubble(randomPhrase, player.x, player.y);
+                        
+                        // Проверка победы
+                        if (flagsCollected >= totalFlags) {
+                            levelComplete();
+                        }
+                    }
+                }
+            });
+            
+            // Проверка сбора бонусов
+            bonuses.forEach(bonus => {
+                if (bonus.active) {
+                    const dx = player.x + player.size/2 - (bonus.x + bonus.size/2);
+                    const dy = player.y + player.size/2 - (bonus.y + bonus.size/2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < player.size/2 + bonus.size/2) {
+                        bonus.active = false;
+                        
+                        if (bonus.type === 'speed') {
+                            // Бонус скорости
+                            speedBonusActive = true;
+                            speedBonusEndTime = Date.now() + 10000; // 10 секунд
+                            showSpeechBubble("Speed boost!", player.x, player.y);
+                        } else {
+                            // Бонус времени
+                            timeLeft += 10;
+                            timeValue.textContent = timeLeft;
+                            showSpeechBubble("+10 seconds!", player.x, player.y);
+                        }
+                        
+                        score += 50;
+                        scoreValue.textContent = score;
+                    }
+                }
+            });
+            
+            // Проверка бонуса скорости
+            if (speedBonusActive && Date.now() > speedBonusEndTime) {
+                speedBonusActive = false;
+            }
+            
+            drawGame();
+        }
+        
+        // Таймер игры
+        function updateTimer() {
+            if (gamePaused || !gameRunning) return;
+            
+            timeLeft--;
+            timeValue.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                gameOver();
+            }
+            
+            // Мигание при малом времени
+            if (timeLeft <= 10) {
+                timeValue.style.color = timeLeft % 2 === 0 ? '#f1c40f' : '#e74c3c';
+            }
+        }
+        
+        // Начало игры
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                gamePaused = false;
+                
+                // Сброс игры
+                score = 0;
+                timeLeft = GAME_TIME;
+                initPlayer();
+                createFlags();
+                createEnemies(5);
+                createBonuses(3);
+                
+                // Обновление UI
+                scoreValue.textContent = score;
+                timeValue.textContent = timeLeft;
+                timeValue.style.color = '#f1c40f';
+                
+                // Запуск игрового цикла
+                gameLoop = setInterval(gameUpdate, 1000/60); // 60 FPS
+                countdown = setInterval(updateTimer, 1000);
+                
+                // Обновление кнопок
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                startBtn.textContent = "ИГРА ИДЁТ";
+                
+                // Скрытие экранов
+                gameOverScreen.style.display = 'none';
+                levelCompleteScreen.style.display = 'none';
+            }
+        }
+        
+        // Пауза игры
+        function pauseGame() {
+            if (gameRunning && !gamePaused) {
+                gamePaused = true;
+                pauseBtn.textContent = "ПРОДОЛЖИТЬ";
+                showSpeechBubble("Game paused!", player.x, player.y);
+            } else if (gameRunning && gamePaused) {
+                gamePaused = false;
+                pauseBtn.textContent = "ПАУЗА";
+            }
+        }
+        
+        // Конец игры
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            clearInterval(countdown);
+            
+            // Обновление рекорда
+            if (score > highScore) {
+                highScore = score;
+                highScoreValue.textContent = highScore;
+                localStorage.setItem('countryballsHighScore', highScore);
+            }
+            
+            // Обновление финального счета
+            finalScore.textContent = score;
+            
+            // Показ экрана окончания игры
+            gameOverScreen.style.display = 'flex';
+            
+            // Обновление кнопок
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            startBtn.textContent = "НАЧАТЬ ИГРУ";
+            pauseBtn.textContent = "ПАУЗА";
+        }
+        
+        // Уровень пройден
+        function levelComplete() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            clearInterval(countdown);
+            
+            // Обновление рекорда
+            if (score > highScore) {
+                highScore = score;
+                highScoreValue.textContent = highScore;
+                localStorage.setItem('countryballsHighScore', highScore);
+            }
+            
+            // Бонус за скорость
+            const timeBonus = timeLeft * 10;
+            score += timeBonus;
+            
+            // Обновление финального счета
+            finalScoreComplete.textContent = score;
+            
+            // Показ экрана победы
+            levelCompleteScreen.style.display = 'flex';
+            
+            // Обновление кнопок
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            startBtn.textContent = "НАЧАТЬ ИГРУ";
+            pauseBtn.textContent = "ПАУЗА";
+        }
+        
+        // Обработка нажатий клавиш
+        function handleKeyDown(event) {
+            if (!gameRunning) return;
+            
+            const speed = speedBonusActive ? PLAYER_SPEED * 1.8 : PLAYER_SPEED;
+            
+            switch(event.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    player.vy = -speed;
+                    event.preventDefault();
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    player.vy = speed;
+                    event.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    player.vx = -speed;
+                    event.preventDefault();
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    player.vx = speed;
+                    event.preventDefault();
+                    break;
+                case ' ':
+                case 'p':
+                case 'P':
+                    pauseGame();
+                    event.preventDefault();
+                    break;
+            }
+        }
+        
+        function handleKeyUp(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                case 'ArrowDown':
+                case 'w':
+                case 'W':
+                case 's':
+                case 'S':
+                    player.vy = 0;
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowRight':
+                case 'a':
+                case 'A':
+                case 'd':
+                case 'D':
+                    player.vx = 0;
+                    break;
+            }
+        }
+        
+        // Инициализация при загрузке
+        window.onload = function() {
+            initPlayer();
+            createFlags();
+            createEnemies(3);
+            createBonuses(2);
+            drawGame();
+            highScoreValue.textContent = highScore;
+            
+            // Назначение обработчиков кнопок
+            startBtn.addEventListener('click', startGame);
+            pauseBtn.addEventListener('click', pauseGame);
+            restartBtn.addEventListener('click', startGame);
+            restartBtn2.addEventListener('click', startGame);
+            nextLevelBtn.addEventListener('click', startGame);
+            
+            // Мобильные кнопки управления
+            leftBtn.addEventListener('mousedown', () => {
+                if (gameRunning) player.vx = -PLAYER_SPEED;
+            });
+            leftBtn.addEventListener('mouseup', () => player.vx = 0);
+            leftBtn.addEventListener('touchstart', () => {
+                if (gameRunning) player.vx = -PLAYER_SPEED;
+            });
+            leftBtn.addEventListener('touchend', () => player.vx = 0);
+            
+            rightBtn.addEventListener('mousedown', () => {
+                if (gameRunning) player.vx = PLAYER_SPEED;
+            });
+            rightBtn.addEventListener('mouseup', () => player.vx = 0);
+            rightBtn.addEventListener('touchstart', () => {
+                if (gameRunning) player.vx = PLAYER_SPEED;
+            });
+            rightBtn.addEventListener('touchend', () => player.vx = 0);
+            
+            upBtn.addEventListener('mousedown', () => {
+                if (gameRunning) player.vy = -PLAYER_SPEED;
+            });
+            upBtn.addEventListener('mouseup', () => player.vy = 0);
+            upBtn.addEventListener('touchstart', () => {
+                if (gameRunning) player.vy = -PLAYER_SPEED;
+            });
+            upBtn.addEventListener('touchend', () => player.vy = 0);
+            
+            // Назначение обработчиков клавиш
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+            
+            // Показ инструкции при первом запуске
+            setTimeout(() => {
+                showSpeechBubble("Choose your countryball and start the game!", 400, 300);
+            }, 1000);
+        };
+    </script>
+</body>
+  </html>
